@@ -36,7 +36,7 @@ const app = new Vue({
 <router-view />
 ```
 - router-link最终会被渲染成一个<a>标签
-- 通过to属性指定要跳转到路径，to属性的值可以是一个字符串路径，也可以通过v-bind指令绑定一个包含name属性的对象。
+- 通过to属性指定要跳转到路径，to属性的值可以是一个字符串路径，象也可以通过v-bind指令绑定一个包含name属性的对。
 - 通过to属性匹配到的组件将被渲染到 router-view里
 
 

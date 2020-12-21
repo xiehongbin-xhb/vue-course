@@ -27,5 +27,5 @@ router.beforeEach((to,from,next) => {
 // router.beforeResolve((to,from) => {
 // 	// 导航被确认过：组件内守卫，异步守卫
 // })
-Vue.use(VueRouter)
+// Vue.use(VueRouter)
 export default router

@@ -1,6 +1,7 @@
 <template>
 	<div>
 		{{ $route.params.name }}
+
 		<!--
 			$route 是当前页面所对应的的路由对象
 			fullPath: "/argu/lison"
@@ -31,6 +32,17 @@
 
 <script>
 export default {
+	props:{
+		name: {
+			type:String,
+			default:'lison'
+		}
+	},
+	beforeRouteUpdate(to, from , next){
+		// 组件被复用时触发
+		// 是可以访问this实例的
+		console.log(to.name,from.name);
+	},
 	created() {
 		console.log('$route',this.$route);
 		console.log('$router',this.$router);

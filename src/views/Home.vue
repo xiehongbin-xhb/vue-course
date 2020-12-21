@@ -1,10 +1,12 @@
 <template>
   <div class="home">
+		{{ food }}
     <img alt="Vue logo" src="../assets/img/logo.png">
     <HelloWorld msg="Welcome to Your Vue.js App"/>
 		<button @click = 'handleClick("back")'> 返回上一页 </button>
 		<button @click = 'handleClick("push")'> 返回parent </button>
 		<button @click = 'handleClick("replace")'> 替换 </button>
+
   </div>
 </template>
 
@@ -13,10 +15,31 @@
 import HelloWorld from '@/components/HelloWorld.vue'
 
 export default {
-  name: 'Home',
+	name: 'Home',
+	props:{
+		food: {
+			type:String,
+			default:'apple'
+		}
+	},
   components: {
     HelloWorld
 	},
+	beforeRouteLeave(to,from,next) {
+		// 即将离开这个页面时触发
+		const leave = confirm('您确定要离开吗');
+		if(leave)next();
+		else next(false);
+	},
+	beforeRouteEnter(to ,from, next) {
+		// 即将进入这个页面时触发
+		console.log('name',to.name);
+		// 这里当前页面还没渲染
+		next( vm => {
+			console.log(vm); // vm就是当前组件的实例
+		});
+	},
+
 	methods:{
 		handleClick(type){
 			if(type === 'back') this.$router.back();

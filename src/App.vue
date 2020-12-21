@@ -8,13 +8,55 @@
 			<router-link v-bind:to="{name:'About'}">About</router-link>
     </div>
 		<!-- 视图组件，通过router-link跳转的内容会在router-view组件位置显示 -->
-    <router-view />
-		<router-view name='email'/>
-		<router-view name='tel'/>
+		<transition-group :name="routerTransition">
+			<!-- name 指定css类名 -->
+			<router-view key="defalut" />
+			<router-view key="email" name='email'/>
+			<router-view key="tel" name='tel'/>
+		</transition-group>
+
   </div>
 </template>
-
+<script>
+export default {
+	data() {
+		return {
+			routerTransition:''
+		}
+	},
+	watch:{
+		'$route'(to) {
+			to.query && to.query.transitionName && (this.routerTransition = to.query.transitionName)
+		}
+	}
+}
+</script>
 <style lang="less">
+.router-enter {
+	// 即将要展示的
+	opacity: 0;
+}
+.router-enter-active {
+	// 展示过程中
+	transition: opacity 1s ease;
+}
+.router-enter-to {
+	// 完全展示的效果
+	opacity: 1;
+}
+
+.router-leave {
+	// 即将要离开的
+	opacity: 1;
+}
+.router-leave-active {
+	// 离开过程中
+	transition: opacity 1s ease;
+}
+.router-leave-to {
+	// 完全离开的效果
+	opacity: 0;
+}
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

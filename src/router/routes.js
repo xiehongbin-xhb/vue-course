@@ -6,22 +6,46 @@ export default [
     path: '/',
 		name: 'Home',
 		// 别名：
-		alias:'home_Page',
-    component: Home
+		// alias:'homePage',
+		component: Home,
+		props: route => {
+			// route 表示当前的路由对象
+			return {
+				food:route.query.food
+			}
+		},
+		// 路由独享守卫
+		beforeEnter: (to,from,next) => {
+			//
+			if(from.name === 'About'){
+				console.log('这是从登录页来的');
+			}
+			else {
+				console.log('这不是从登录页来的');
+			}
+			next();
+		}
   },
   {
-    path: '/about',
+		path: '/about',
+		meta:{
+			title:'关于'
+		},
     name: 'About',
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+		component: () => import(/* webpackChunkName: "about" */ '../views/About.vue'),
+		props:{
+			food:'banana'
+		}
 	},
 	{
 		// 动态路由对象
 		path:'/argu/:name',
 		name: 'Argu',
-		component:() =>  import('@/views/Argu.vue')
+		component:() =>  import('@/views/Argu.vue'),
+		props:true // 会将组件的params作为props传递给对应的组件，在这里就是 把name传给组件
 	},
 	{
 		path:'/parent',
@@ -63,4 +87,13 @@ export default [
 			}
 		}
 	},
+	{
+		path:'/login',
+		name:'login',
+		component:() => import('@/views/Login.vue'),
+	},
+	{
+		path:'*',
+		component:() => import('@/views/error_404.vue'),
+	}
 ]

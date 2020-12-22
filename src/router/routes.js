@@ -93,6 +93,11 @@ export default [
 		component:() => import('@/views/Login.vue'),
 	},
 	{
+		path:'/store',
+		name:'store',
+		component:() => import('@/views/store.vue'),
+	},
+	{
 		path:'*',
 		component:() => import('@/views/error_404.vue'),
 	}

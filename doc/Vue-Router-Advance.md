@@ -190,5 +190,25 @@ routes配置中的每个路由对象为路由记录，路由记录是可以嵌�
 
 在为后面的视图获取数据时，用户会停留在当前的界面。因此建议在数据获取期间，展示一些进度条或者别的提示。如果数据获取失败，同样有必要展示一些全局的错误提醒。
 
+## 滚动行为
+想要页面滚动到顶部，或者保持原先的滚动位置
+这个功能只在支持history.pushState的浏览器中可用
+当创建一个Router实例，你可以提供一个scrollBehavior方法
+```js
+const router = new VueRouter({
+  routes:[],
+  scrollBehavior(to,from, savePosition) {
+    return // 希望滚动到什么位置
+  }
+})
+```
+参数解析：
+to 要去的页面对应的路由对象
+from 来的页面对应的路由对象
+savaPosition 当且仅当popState导航时才可用
+返回的位置的对象信息，可以是下面这样：
+{ x:number, y:number }
+如果返回一个falsy，或者是一个空对象，则不会发生滚动
+返回savaPosition 在按下后退或者前进按钮时，就会像浏览器的原生表现那样
 
 

@@ -211,4 +211,30 @@ savaPosition 当且仅当popState导航时才可用
 如果返回一个falsy，或者是一个空对象，则不会发生滚动
 返回savaPosition 在按下后退或者前进按钮时，就会像浏览器的原生表现那样
 
+## 路由懒加载
+把不同路由对应的组件分割成不同的代码块，然后当路由访问的时候才加载对应组件
+结合Vue的异步组件和webpack的代码分割功能，实现路由组件的懒加载。
+
+## 导航故障
+当使用router-link时，Vue Router会自动调用router.push来触发一次导航。
+当使用router-link组件，导航失败不会打印出错误。
+如果使用router.push 或者 router.replace时，控制台可能会打印出错误。
+```js
+import VueRouter from 'vue-router
+import { isNavigationFailure, NavigationFailureType } = VueRouter
+route.push('/admin').catch( failure => {
+  // isNavigationFailure 判断是否是到导航故障
+  // 第二个参数 可以用来区分不同类型的导航故障，如果省略智慧检查这个错误是否为导航故障
+  if(isNavigationFailure(failure, NavigationFailureType.redirected)) {
+    // 给用户一个提示
+    // failure 导航故障都有to和from属性。用来表达这次失败的导航的当前位置和目标位置
+  }
+})
+```
+NavigationFailureType：
+- redirected 在导航守卫中调用了next(nextLocation)重定向到其他地方
+- aborted 在导航中调用了next(false)中断了本次导航
+- canceled 在当前导航还没完成之前又有了一个新的导航，比如在等待导航守卫的过程中又调用router.push
+- duplicated 导航被阻止，已经在目标位置了
+
 

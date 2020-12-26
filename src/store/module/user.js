@@ -13,5 +13,9 @@ export default{
 	state,
 	getters,
 	mutations,
-	actions
+	actions,
+	modules: {
+		// 下一级的模块
+	}
 }
+// 动态注册一个模块

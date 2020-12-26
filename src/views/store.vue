@@ -3,7 +3,9 @@
 		<p>appNameWithVersion : {{ appNameWithVersion }}</p>
     <a-input v-model="inputValue"></a-input>
 		<p>{{inputValue}}</p>
-		<!-- <p>{{appName}}</P> -->
+		<p>{{appName}}</P>
+		<button @click="handleChangeAppName">修改appName</button>
+		<button @click="handleChangeAppNameByAction">触发action</button>
 		<!-- <p>{{userName}}</p> -->
 
   </div>
@@ -18,10 +20,29 @@ export default {
 			inputValue:''
 		}
 	},
+	methods:{
+		handleChangeAppName(){
+			// appName 是store中的数据，如果要修改，需要触发一个mutation
+			// 方式一
+			// this.$store.commit('SET_APP_NAME',{
+			// 	appName:'newAppName'
+			// });
+			// 方式2
+			this.$store.commit({
+				type:'SET_APP_NAME',
+				appName:'newAppName'
+			});
+			this.$store.commit('SET_APP_VERSION');
+		},
+		handleChangeAppNameByAction(){
+			// ...
+			this.$store.dispatch('updateAppName', '123')
+		}
+	},
 	computed: {
-		// appName() {
-		// 	return this.$store.state.appName
-		// },
+		appName() {
+			return this.$store.state.appName
+		},
 		// userName(){
 		// 	return this.$store.state.user.userName
 		// }

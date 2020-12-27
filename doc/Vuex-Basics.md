@@ -70,7 +70,101 @@ computed: {
 }
 ```
 ### Getters
+有时候需要从store中的state派生出一些状态
+Vuex允许在store中定义getter，可以理解为store的计算属性
+就像计算属性一样，getter的返回值会根据它的依赖被缓存起来，且只有当它的依赖值发生改变时才会被重新计算
+每个getter属性值都是一个函数，函数接收state作为第一个参数
+也可以接收其他getter作为第二个参数：getters
+Getter会暴露为store.getters对象
+在组件中使用 this.$store.getters.getterName
+
+也可以通过让getter返回一个函数，来实现给getter传参，在你对store里的数组进行查询时非常有用
+```js
+getters: {
+  getTodoById: (state => (id) => {
+    return state.todos.find(todo => todo.id === id)
+  })
+}
+```
+getter在通过方法进行访问时，每次都会去进行调用，而不会缓存结果
+
+mapGetters辅助函数
+mapGetters辅助函数仅仅是将store中的getter映射到局部计算属性
+使用对象展开符将getter混入到computed对象中
+```js
+import { mapGetters } from 'vuex
+export default {
+  // 
+  computed: {
+    ...mapGetters([
+      'doneTodosCount'
+    ]),
+    // 如果想将一个getter属性取另外一个名字，需要使用对象形式
+    ...mapGetters({
+      doneCount:'doneTodosCount'
+    })
+  }
+}
+```
+
 ### Mutations
+更改Vuex的store中的状态的唯一方法是提交mutation。
+mutation都有一个字符串类型的事件类型type，和一个回调函数handler
+回调函数接收state作为第一个参数
+
+不能直接调用mutation handler，要触发一个mutation时，需要调用store.commit('')
+
+可以向store.commit 传入额外的参数，即mutation的载荷（payload）
+大多数情况下，payload应该是一个对象，这样可以包含多个字段并且记录的mutation会更易读
+```js
+mutations:{
+  increament(state,payload) {
+    state.count += payload.amount
+  }
+}
+store.commit('increment', {
+  amount: 10
+})
+```
+提交mutation的另外一种方式，是直接使用包含type属性的对象
+```js
+store.commit({
+  type: 'increment',
+  amount: 10
+})
+```
+注意：
+mutation需要遵守一些注意事项：
+1. 最好提前在store中初始化所有所需属性
+2. 当需要在对象上添加新属性，需要使用
+- 使用Vue.set(obj,'newProp',123)
+- 以新对象替换老对象
+```js
+state.obj = { ...state.obj, newProp: 123 }
+```
+
+使用常量替代Mutation事件类型
+Mutations必须是同步操作
+
+在组件中提交Mutation
+可以在组件中使用this.$store.commit('xx')提交mutation
+或者使用mapMutations辅助函数，将组件中的methods映射成store.commit 
+```js
+import { mapMutations } from 'vuex'
+export default {
+  methods: {
+    ...mapMutations([
+      'increment',// 将this.increment 映射成 this.$store.commit('increment')
+      // mapMutations 也支持载荷
+      'incrementBy', // 将this.incrementBy(mount) 映射成this.$store.commit('increment')
+    ]),
+    // 对象格式
+    ...mapMutations({
+      add:'increment' // 将this.add() 映射成 this.$store.commit('increment')
+    })
+  }
+}
+```
 ### Actions
 ### Modules
 ## 进阶

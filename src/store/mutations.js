@@ -5,7 +5,7 @@ const mutations = {
 		// state.appName = params;
 		state.appName = params.appName;
 	},
-	SET_APP_VERSION(){
+	"SET_APP_VERSION":function(){
 		vue.set(state,"appVersion", 'v2.0')
 	}
 }

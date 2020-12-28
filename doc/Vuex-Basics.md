@@ -352,4 +352,106 @@ const store = new Vuex.Store({
 参数传递
 如果希望使用全局state和getter，rootState和rootGetters 会作为第三和第四参数传入getter，也会通过context对象的属性传入action
 
+启用了命名空间之后，
+mutations或者state ，如果希望获取到全局的state或者getters， rootState，rootGetters会作为第三，第四参数传递进去
+action部分，rootState会作为context的属性
+
+如果希望在子模块内派发出全局的action或者mutation，将root:true作为第三个参数传给dispatch或者commit
+```js
+modules: {
+  foo: {
+    namespaced: true, // 模块内开启命名空间
+    state: {
+      // 定义的state自带有“命名空间”，访问需要带模块名
+    },
+    getters: {
+      // 在这个模块的 getter 中，`getters` 被局部化了
+      // 你可以使用 getter 的第四个参数来调用 `rootGetters`
+      someGetter (state, getters, rootState, rootGetters) {
+        getters.someOtherGetter // -> 'foo/someOtherGetter'
+        rootGetters.someOtherGetter // -> 'someOtherGetter'
+      },
+      someOtherGetter: state => { ... }
+    },
+
+    actions: {
+      // 在这个模块中， dispatch 和 commit 也被局部化了
+      // 他们可以接受 `root` 属性以访问根 dispatch 或 commit
+      someAction ({ dispatch, commit, getters, rootGetters }) {
+        // 四个参数： dispatch commit  getters rootGetters
+        getters.someGetter // -> 'foo/someGetter'
+        rootGetters.someGetter // -> 'someGetter'
+
+        dispatch('someOtherAction') // -> 'foo/someOtherAction'
+        dispatch('someOtherAction', null, { root: true }) // -> 'someOtherAction'
+
+        commit('someMutation') // -> 'foo/someMutation'
+        commit('someMutation', null, { root: true }) // -> 'someMutation'
+      },
+      someOtherAction (ctx, payload) { ... }
+    }
+  }
+}
+```
+在命名空间的模块中定义全局action
+以对象的形式定义一个action，带有root属性以及handler属性
+```js
+{
+  actions: {
+    someOtherAction ({dispatch}) {
+      dispatch('someAction')
+    }
+  },
+  modules: {
+    foo: {
+      namespaced: true,
+
+      actions: {
+        someAction: {
+          root: true,
+          handler (namespacedContext, payload) { ... } // -> 'someAction'
+        }
+      }
+    }
+  }
+}
+```
+使用辅助函数mapState,mapMutations,mapActions绑定带命名空间的
+将模块名作为第一个参数
+```js
+computed: {
+  ...mapState('some/nested/module', {
+    a: state => state.a,
+    b: state => state.b
+  })
+},
+methods: {
+  ...mapActions('some/nested/module', [
+    'foo', // -> this.foo()
+    'bar' // -> this.bar()
+  ])
+}
+```
+
+使用createNamespaceHelpers,创建基于某个命名空间辅助函数，返回一个对象，对象有新的绑定在给命名空间值上的组件绑定辅助函数
+相当于返回了一个新的辅助函数，用于映射具体某个模块的属性
+```js
+import { createNamespacedHelpers } from 'vuex'
+
+const { mapState, mapActions } = createNamespacedHelpers('some/nested/module')
+```
+
+动态注册模块
+通过store.registerModule注册模块
+
+```js
+// 注册模块 `myModule`
+store.registerModule('myModule', {
+  // ...
+})
+// 注册嵌套模块 `nested/myModule`
+store.registerModule(['nested', 'myModule'], {
+  // ...
+})
+```
 ## 进阶

@@ -549,6 +549,7 @@ handleClick(){
   // 通过对象形式传递过去mutation，mutation回调函数的第二个参数就是这个对象，可以通过payload上解构出想要的值
 }
 // 方式二 通过mapMutation辅助函数，将this.$store.commit('EDIT_STATE') 映射成 this['EDIT_STATE']()，映射成 methods上的方法
+// 映射之后，使用时可以直接写方法 如  <button @click="EDIT_STATE({ fixText: 'fixText1111' })"> 
 methods:{
   // 对象形式
   ...mapMutations({
@@ -567,7 +568,34 @@ methods:{
 }
 ```
 3. action
+```js
+// 如何定义
+actions:{
+  // action的handler会接受一个和store实例拥有相同属性和方法的context对象，可以从上面解构出commit，dispatch方法
+  EDIT_ACTION(context) {
+    // action中不能直接修改state，如需修改，应触发一个对应的mutation来修改
+    const { commit, dispatch } = context;
+    commit('EDIT_STATE','这是通过触发action来修改store中的state');
+  }
+}
+// 组件中如何使用
+// 方式1 通过this.$store.dispatch 来派发出相应的action
+methods:{
+  dispatchAciton(){
+    this.$store.dispatch('EDIT_ACTION');
+  }
+}
+// 方式2  通过mapActions辅助函数，将methods里的方法加以映射
+// 映射之后 使用时 可直接写方法名 如：<button @click="dispatchAction">触发action </button>
+methods: {
+  // mapActions支持两种方式传参
+  ...mapActions({
+    // 对象形式,可以对action名称进行修改
+    dispatchAcion:'EDIT_ACTION'
+  })
+  // 字符串数组形式
+  ...mapActions(['EDIT_ACTION'])
+}
+```
 
-如何定义
-如何获取
-如何使用
+4. modules 在模块中使用

@@ -454,4 +454,120 @@ store.registerModule(['nested', 'myModule'], {
   // ...
 })
 ```
-## 进阶
+
+
+## 总结
+全局状态
+1. state
+定义: state直接写
+在组件中如何使用：this.$store.state.stateName
+```js
+// 在store中定义
+const store = new Vuex.Store({
+  state:{
+    stateName:'这是stateName的值'
+  }
+})
+// 在组件中如何使用
+// 方式1 计算属性
+computed: {
+  stateName() {
+    return this.$store.state.stateName
+  }
+}
+// 方式2 使用mapState辅助函数
+import { mapState } from 'vuex'
+// mapState函数会将vuex中的state映射成当前组件实例的计算属性
+computed:{
+  // 使用mapState函数有两种方式
+  // 方式1 给mapState函数传递一个字符串数组
+  ...mapState(['stateName']) // 相当于将this.$store.state.stateName 映射成 this.stateName
+  // 方式2 给mapState函数传递一个对象
+  ...mapState({
+    // 对象的属性名就是state名字
+    // 属性值可以是一个函数，函数接受state作为参数，也可以是一个stateName的字符串
+    // 这种情况下 可以对stateName进行改名
+    fixStateName: stateName => state.stateName
+    fixStateName1：'stateName'
+  })
+}
+```
+2. getters
+定义：
+
+```js
+// 在getters对象中定义
+getters: {
+  stateGetter(state, getters){
+    // 接受state作为参数1，getters作为参数2，可以用来获取其他getters
+    return state.stateName + 'fix' // 返回新的getters
+  }
+}
+// 在组件中如何使用
+// 方式1 计算属性
+computed: {
+  stateGetter1(){
+    return this.$store.getters.stateGetter;
+  }
+}
+// 方式2 通过mapGetters辅助函数
+computed: {
+  // mapGetters  使用对象参数类型，支持对getter进行改名
+  ...mapGetters({
+    stateGetter1:'stateGetter'
+  }),
+  // mapGetters  使用字符串数组参数类型
+  ...mapGetters([
+    'stateGetter'
+  ]),
+}
+
+```
+3. mutation
+```js
+// 定义mutation
+mutations:{
+  // 事件类型  对应的回调函数
+  "EDIT_STATE":function(state,payload){
+    // payload参数的获取要根据携带过来的参数格式做处理，不同情况下不一样
+    state.stateName = 'newStateName By mutation'
+  }
+}
+// 组件中触发mutation
+// 方式1  通过 this.$store.commit()
+handleClick(){
+  // commmit 方法允许使用两种方式进行传参
+  // 方式1 传两个参数，参数1 mutation类型，参数2 要携带的参数
+  this.$store.commit('EDIT_STATE','这是通过触发mutation之后要修改的值');
+  // 参数1 mutation类型  参数2 payload
+  // 方式2 一个参数 ，带有type属性的是对象
+  this.$store.commit({
+    type:'EDIT_STATE',
+    // 要携带的参数，可以罗列写在这里
+    fixedContent:'这是通过触发mutation之后要修改的值'
+  })
+  // 通过对象形式传递过去mutation，mutation回调函数的第二个参数就是这个对象，可以通过payload上解构出想要的值
+}
+// 方式二 通过mapMutation辅助函数，将this.$store.commit('EDIT_STATE') 映射成 this['EDIT_STATE']()，映射成 methods上的方法
+methods:{
+  // 对象形式
+  ...mapMutations({
+    // 不传参数写法
+    btnClick: 'EDIT_STATE' 
+    // 传参数写法
+    btnClick: {
+      type:'EDIT_STATE',
+      fixedContent:'这是通过触发mutation后修改的值，对象形式'
+    }
+  })
+  // 字符串数组形式
+  ...mapMutations(['EDIT_STATE']) // 不传参数写法
+  // 如果需要以这种方式传递参数，需要在调用该方法的时候去写参数
+  // 如: this['EDIT_STATE']({ fixedContent:'这是通过触发mutation后修改的值，字符串数组形式' })
+}
+```
+3. action
+
+如何定义
+如何获取
+如何使用

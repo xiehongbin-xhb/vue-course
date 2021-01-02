@@ -599,3 +599,95 @@ methods: {
 ```
 
 4. modules 在模块中使用
+state
+```js
+// 定义
+const store = {
+  modules: {
+    testModule: {
+      state: {
+        moduleState:'这是store中的state'
+      }
+    }
+  }
+}
+// 在组件中获取
+// 方式1  this.$store.state.模块名.stateName,通过计算属性
+computed: {
+  moduleState(){
+    return this.$store.state.testModule.moduleState
+  }
+}
+// 方式2 通过mapState辅助函数 
+computed: {
+  ...mapState({
+    testState: state => state.testModule.testState
+  })
+}
+```
+mutation,getters,action
+```js
+// 定义： 未带有命名空间的
+const store = {
+  modules: {
+    testModule: {
+      state: {
+        moduleState:'这是模块中 store中的state'
+      },
+      getters: {
+        moduleGetter: '这是模块中 store中的getter'
+      },
+      actions: {
+        EDIT_STATE_ACTION_MODULE(context) {
+          const { commit } = context;
+          commit('EDIT_MODULE_STATE','通过action来修改的state，')
+        }
+      },
+      mutation: {
+        // 参数1  接收的是局部状态组件
+        // 参数2 payload 触发mutation携带的参数
+        EDIT_MODULE_STATE(state, payload){
+          state.moduleState = payload + '这是模块中'
+        }
+      }
+    }
+  }
+}
+// 触发
+// 未带有命名空间的模块，mutation，getters,action都是全局的，获取getters以及触发mutation,action都和之前的一致
+// 触发mutation 1. this.$store.commit('EDIT_MODULE_STATE','测试') 2. 通过mapMutations函数，将methods中的方法 映射成  this.$store.commit('')
+// 获取getters 都是通过计算属性 1. this.$store.getters.getterName 2. 通过mapGetters函数 ，将getters映射成 计算属性
+// 派发action 1. this.$store.dispatch('EDIT_STATE_ACTION_MODULE') 2. 通过mapActions函数，将methods中的方法 映射成  this.$store.dispatch('')
+```
+
+命名空间  定义模块时设置  namespaced:true 
+设置之后，这个模块所有的getters，actions，mutations都会自动根据模块注册的路径命名
+```js
+// 定义
+const store = {
+  modules: {
+    namespaced:true,
+    testModule: {
+      state: {
+        moduleState:'这是模块中 store中的state'
+      },
+      getters: {
+        moduleGetter: '这是模块中 store中的getter'
+      },
+      actions: {
+        EDIT_STATE_ACTION_MODULE(context) {
+          const { commit } = context;
+          commit('EDIT_MODULE_STATE','通过action来修改的state，')
+        }
+      },
+      mutation: {
+        // 参数1  接收的是局部状态组件
+        // 参数2 payload 触发mutation携带的参数
+        EDIT_MODULE_STATE(state, payload){
+          state.moduleState = payload + '这是模块中'
+        }
+      }
+    }
+  }
+}
+```

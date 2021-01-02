@@ -47,6 +47,38 @@ const store = new Vuex.Store({
           return "fix" + state.testState;
         }
       }
+    },
+    nameSpaceModule: {
+      namespaced: true,
+      state: {
+        stateNameSpace: "这是带有命名空间的模块的state",
+        stateNameSpace1: "这是带有命名空间的模块的state1"
+      },
+      getters: {
+        // 带有命名空间之后getter回调函数会多接受两个三个 rootState,rootGetters
+        // 用于获取全局的状态和getters
+        // 也会作为context的属性传入action回调函数的context函数
+        getterNameSpace(state, getters, rootState, rootGetters) {
+          return "这是带有命名空间的getter";
+        },
+        getterNameSpace1(state, getters, rootState, rootGetters) {
+          return "这是带有命名空间的getter1";
+        }
+      },
+      mutations: {
+        // 定义mutation暂时没有区别
+        EDIT_STATE_NAMESPACE(state, payload) {
+          state.stateNameSpace = payload;
+        }
+      },
+      actions: {
+        EDIT_STATE_ACTION_NAMESPACE(context) {
+          // context 包含四个属性  commit  dispatch rootState rootGetters
+          const { commit, dispatch, rootState, rootGetters } = context;
+          console.log("context", context);
+          commit("EDIT_STATE_NAMESPACE", "通过action要修改的值");
+        }
+      }
     }
   }
 });

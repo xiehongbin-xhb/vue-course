@@ -690,4 +690,118 @@ const store = {
     }
   }
 }
+// 访问带有命名空间的模块
+// 访问state,getters
+computed:{
+  // 通过this.$store
+  stateNameSpace(){
+      return this.$store.state.nameSpaceModule.stateNameSpace
+  },
+  // 通过mapState： 只能使用对象形式，字符串数组形式不可用
+  ...mapState({
+      stateNameSpace1: (state) => state.nameSpaceModule.stateNameSpace1
+    }),
+  // 访问getter
+  // 方式1：
+  getterNameSpace(){
+      // 这是不带命名空间的getter获取方式
+      // return this.$store.getters.getterNameSpace 
+      // 这是带有命名空间的getter获取方式
+      return this.$store.getters['nameSpaceModule/getterNameSpace']
+  }
+  // 方式2：只支持对象形式，不支持字符串数组
+  ...mapGetters({
+      getterNameSpace1: "nameSpaceModule/getterNameSpace1",
+    }),
+},
+// 触发mutation,action
+methods:{
+  // 触发action
+  // 方式1 通过 this.$store
+  dispatchNameSpaceAction() { // dispatchNameSpaceAction为点击按钮时执行的函数
+      this.$store.dispatch("nameSpaceModule/EDIT_STATE_ACTION_NAMESPACE");
+  },
+  // 方式2 通过mapActions
+  // 对象形式
+  ...mapActions({
+      dispatchNameSpaceAction: "nameSpaceModule/EDIT_STATE_ACTION_NAMESPACE",
+      dispatchNameSpaceAction1: {
+        type: "nameSpaceModule/EDIT_STATE_ACTION_NAMESPACE",
+      },
+    }),
+  // 字符串数组形式
+  ...mapActions(["nameSpaceModule/EDIT_STATE_ACTION_NAMESPACE"]),// 会映射成this['nameSpaceModule/EDIT_STATE_ACTION_NAMESPACE'],这样的形式在template模板内不能写，需要加一层函数
+    dispatchNameSpaceAction1() {
+      this["nameSpaceModule/EDIT_STATE_ACTION_NAMESPACE"]();
+  },
+  // 为了解决这个难写的问题，可以给map**这样的辅助函数传递一个标识模块名的字符串
+  ...mapActions('nameSpaceModule',["EDIT_STATE_ACTION_NAMESPACE"]), // 这么写之后就可以直接通过this['EDIT_STATE_ACTION_NAMESPACE']() 来调用这个函数
+  // 触发mutation
+  // 方式1 通过 this.$store
+  dispatchNameSpaceMutation() { // dispatchNameSpaceMutation为点击按钮时执行的函数
+      this.$store.commit(
+        "nameSpaceModule/EDIT_STATE_NAMESPACE",
+        "这是要修改的内容"
+      );
+  },
+  // 方式2 通过 mapMutations 
+  // 对象形式
+  ...mapMutations({
+      // 需要携带参数1
+      dispatchNameSpaceMutation: {
+        // 需要带moduleName
+        type: "nameSpaceModule/EDIT_STATE_NAMESPACE",
+        fixContent: "这是要修改的内容1",
+      },
+      // 需要携带参数2  也可以在调用  @click = dispatchNameSpaceMutation(param)  传递参数
+      dispatchNameSpaceMutation1: 'nameSpaceModule/EDIT_STATE_NAMESPACE',
+    }),
+    // 不需要携带参数
+    // 字符串数组形式
+    ...mapMutations(["nameSpaceModule/EDIT_STATE_NAMESPACE"]), // 会映射成this['nameSpaceModule/EDIT_STATE_NAMESPACE'],这样的形式在template模板内不能写，需要加一层函数
+    dispatchNameSpaceMutation1() {
+      this["nameSpaceModule/EDIT_STATE_NAMESPACE"]("这是要修改的内容1222");
+    },
+    //  为了解决这个难写的问题，可以给map**这样的辅助函数传递一个标识模块名的字符串
+    ...mapMutations("nameSpaceModule", ["EDIT_STATE_NAMESPACE"]),
+    
+
+}
+
+
+在带命名空间的模块中注册全局action或者提交mutation
+只需要将 root:true 作为第三个参数传递出去即可   
+dispatch('someOtherAction') // -> 'foo/someOtherAction'
+dispatch('someOtherAction', null, { root: true }) // -> 'someOtherAction'
+
+commit('someMutation') // -> 'foo/someMutation'
+commit('someMutation', null, { root: true }) // -> 'someMutation'
+
 ```
+```js
+// 还可以引入createNamespacedHelpers来创建基于某个命名空间辅助函数，它返回一个对象，对象内有新的辅助函数
+import { createNamespacedHelpers } from 'vue'
+const functionObj = createNamespacedHelpers('nameSpaceModule');
+const nameSpaceModuleMapState = functionObj.mapState;
+const nameSpaceModuleMapGetters = functionObj.mapGetters;
+const nameSpaceModuleMapMutations = functionObj.mapMutations;
+const nameSpaceModuleMapActions = functionObj.mapActions;
+
+// 创建
+const store = {
+  state:{},
+  mutations:{},
+  getters:{},
+  actions:{},
+  modules:{
+    nameSpaceModule:{
+     namespaced: true,
+     state:{},
+     getters:{},
+     mutations:{},
+     actions:{} 
+    }
+  }
+}
+```
+
